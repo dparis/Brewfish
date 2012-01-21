@@ -29,6 +29,10 @@ module Brewfish
       points.length - 1
     end
 
+    #----------------------------------------------------------------------------
+    # Private methods
+    #----------------------------------------------------------------------------
+    
     private
 
     # Perform Bresenham's line algorithm and store all of the
