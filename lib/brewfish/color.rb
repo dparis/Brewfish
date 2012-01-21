@@ -65,6 +65,40 @@ module Brewfish
 
       return Brewfish::Color.new( :rgb => [new_r, new_g, new_b] )
     end
+
+    def hsl_values
+      hsl = self.to_hsl
+      return [hsl.h, hsl.s, hsl.l]
+    end
+
+    def hsv_values
+      hsl = self.to_hsl
+      return Brewfish::Util::Colors.hsl_to_hsv( hsl.h, hsl.s, hsl.l )
+    end
+
+    #----------------------------------------------------------------------------
+    # Class Methods
+    #----------------------------------------------------------------------------
+
+    def self.lerp_between( start_color, target_color, coefficient )
+      return start_color.lerp( target_color, coefficient )
+    end
+    
+    def self.build_color_map( key_colors )
+      color_map = {}
+
+      (key_colors.length - 1).times do |segment|
+        cur_index, cur_color = key_colors[segment]
+        next_index, next_color = key_colors[segment+1]
+
+        (cur_index..next_index).each do |index|
+          coefficient = (( index - cur_index ).to_f / ( next_index - cur_index ).to_f)
+          color_map[index] = Brewfish::Color.lerp_between( cur_color, next_color, coefficient )
+        end
+      end
+
+      return color_map
+    end
   end
 
   #----------------------------------------------------------------------------
