@@ -1,110 +1,187 @@
-require 'color'
 require 'delegate'
-
-# Stuff the Color module defined by the Color gem into a different
-# module namespace and then nil it out so the Color class defined in
-# the Brewfish namespace doesn't get confused
+require 'gosu'
 
 module Brewfish
-  class Color < DelegateClass(Color::RGB)
+  class Color < DelegateClass(Gosu::Color)
+    include Comparable
+    
+    def initialize( *args )
+      # Determine the source type and initialize the internal colour
+      # object properly
+      options = args.shift
+
+      if options.respond_to?(:shift)
+        source, arg = options.shift
+      elsif options.nil?
+        source, arg = [nil, nil]
+      else
+        raise ArgumentError, "Invalid color arguments: #{arg}"
+      end
+
+      case source
+      when nil
+        @gosu_color = Gosu::Color.rgba( 0, 0, 0, 255 )
+      when :argb_int
+        @gosu_color = Gosu::Color.new( arg )
+      when :rgb
+        if arg.instance_of?(Array) && arg.length == 3
+          @gosu_color = Gosu::Color.rgb( arg[0], arg[1], arg[2] )
+        else
+          raise ArgumentError, "Invalid RGB values: #{arg}"
+        end
+      when :rgba
+        if arg.instance_of?(Array) && arg.length == 4
+          @gosu_color = Gosu::Color.rgba( arg[0], arg[1], arg[2], arg[3] )
+        else
+          raise ArgumentError, "Invalid RGBA values: #{arg}"
+        end
+      when :hsv
+        if arg.instance_of?(Array) && arg.length == 3
+          @gosu_color = Gosu::Color.from_hsv( arg[0], arg[1], arg[2] )
+        else
+          raise ArgumentError, "Invalid HSV values: #{arg}"
+        end
+      when :hsva
+        if arg.instance_of?(Array) && arg.length == 4
+          @gosu_color = Gosu::Color.from_ahsv( arg[3], arg[0], arg[1], arg[2] )
+        else
+          raise ArgumentError, "Invalid HSVA values: #{arg}"
+        end
+      when :named
+        named_color = NAMED_COLORS[arg]
+        raise ArgumentError, "Invalid named color: #{arg}"  unless named_color
+
+        @gosu_color = Gosu::Color.rgb( named_color[0], named_color[1], named_color[2] )
+      else
+        raise ArgumentError, "Invalid color arguments: #{arg}"
+      end
+
+      super( @gosu_color )
+    end
+
     #----------------------------------------------------------------------------
     # Instance Methods
     #----------------------------------------------------------------------------
-    
-    def initialize( options )
-      # Determine the source type and initialize the internal colour
-      # object properly
-      @rgb = nil
 
-      source, arg = options.shift
+    def <=>( other )
+      raise ArgumentError unless other.instance_of?(Brewfish::Color)
 
-      case source
-      when :rgb
-        @rgb = ::Color::RGB.new( arg[0], arg[1], arg[2] )
-      when :hsv
-        h,s,l = Brewfish::Util::Colors.hsv_to_hsl( arg[0], arg[1], arg[2] )
-        @rgb = ::Color::HSL.from_fraction( h, s, l ).to_rgb
-      when :named
-        named_color = NAMED_COLORS[arg]
-        raise ArgumentError unless named_color
-        
-        @rgb = ::Color::RGB.new( named_color[0], named_color[1], named_color[2] )
+      result = nil
+
+      if self.red == other.red && self.green == other.green && self.blue == other.blue
+        result = 0
+      elsif self.red > other.red && self.green > other.green && self.blue > other.blue
+        result = 1
+      else
+        result = -1
       end
 
-      # Set up the delegate object
-      super(@rgb)
+      return result
     end
 
     # Multiplication operator
-    def *(factor)
-      new_color = nil
+    def *( other )
+      new_color = Brewfish::Color.new
 
-      if factor.is_a?( Brewfish::Color )
-        new_r = (( self.red * factor.red ) / 255).to_i
-        new_g = (( self.green * factor.green ) / 255).to_i
-        new_b = (( self.blue * factor.blue ) / 255).to_i
-
-        new_color = Brewfish::Color.new( :rgb => [new_r, new_g, new_b] )
-      elsif factor.is_a?( Numeric )
-        rgb_range = (0..255)
-
-        new_r = Brewfish::Util::Math.clamp( ( self.red * factor ).to_i, rgb_range )
-        new_g = Brewfish::Util::Math.clamp( ( self.green * factor ).to_i, rgb_range )
-        new_b = Brewfish::Util::Math.clamp( ( self.blue * factor ).to_i, rgb_range )
-
-        new_color = Brewfish::Color.new( :rgb => [new_r, new_g, new_b] )
+      if other.is_a?( Brewfish::Color )
+        new_color.red   = (( self.red   * other.red ) / 255)
+        new_color.green = (( self.green * other.green ) / 255)
+        new_color.blue  = (( self.blue  * other.blue ) / 255)
+        new_color.alpha = (( self.alpha * other.alpha ) / 255)
+      elsif other.is_a?( Numeric )
+        new_color.red   = ( self.red   * other )
+        new_color.green = ( self.green * other )
+        new_color.blue  = ( self.blue  * other )
+        new_color.alpha = ( self.alpha * other )
+      else
+        raise ArgumentError, "Cannot multiply #{self} and #{other}"
       end
 
       return new_color
     end
 
+    # Addition operator
+    def +( other )
+      new_color = Brewfish::Color.new
+
+      if other.is_a?( Brewfish::Color )
+        new_color.red   = ( self.red   + other.red )
+        new_color.green = ( self.green + other.green )
+        new_color.blue  = ( self.blue  + other.blue )
+        new_color.alpha = ( self.alpha + other.alpha )
+      else
+        raise ArgumentError, "Cannot add #{self} and #{other}"
+      end
+
+      return new_color
+    end
+
+    # Addition operator
+    def -( other )
+      new_color = Brewfish::Color.new
+
+      if other.is_a?( Brewfish::Color )
+        new_color.red   = ( self.red   - other.red )
+        new_color.green = ( self.green - other.green )
+        new_color.blue  = ( self.blue  - other.blue )
+        new_color.alpha = ( self.alpha - other.alpha )
+      else
+        raise ArgumentError, "Cannot add #{self} and #{other}"
+      end
+
+      return new_color
+    end
+
+    # Perform a linear interpolation between two colors and return a
+    # color along that gradient based on the coefficient
     def lerp( target_color, coefficient )
-      new_r = ( self.red + ( ( target_color.red - self.red ) * coefficient ) ).to_i
-      new_g = ( self.green + ( ( target_color.green - self.green ) * coefficient ) ).to_i
-      new_b = ( self.blue + ( ( target_color.blue - self.blue ) * coefficient ) ).to_i
+      new_color = Brewfish::Color.new
 
-      return Brewfish::Color.new( :rgb => [new_r, new_g, new_b] )
+      new_color.red   = ( self.red   + ( ( target_color.red   - self.red )   * coefficient ) )
+      new_color.green = ( self.green + ( ( target_color.green - self.green ) * coefficient ) )
+      new_color.blue  = ( self.blue  + ( ( target_color.blue  - self.blue )  * coefficient ) )
+      new_color.alpha = ( self.alpha + ( ( target_color.alpha - self.alpha ) * coefficient ) )
+
+      return new_color
     end
 
-    def hsl_values
-      hsl = self.to_hsl
-      return [hsl.h, hsl.s, hsl.l]
-    end
-
-    def hsv_values
-      hsl = self.to_hsl
-      return Brewfish::Util::Colors.hsl_to_hsv( hsl.h, hsl.s, hsl.l )
-    end
 
     #----------------------------------------------------------------------------
     # Class Methods
     #----------------------------------------------------------------------------
 
-    def self.lerp_between( start_color, target_color, coefficient )
-      return start_color.lerp( target_color, coefficient )
-    end
-    
-    def self.build_color_map( key_colors )
-      color_map = {}
-
-      (key_colors.length - 1).times do |segment|
-        cur_index, cur_color = key_colors[segment]
-        next_index, next_color = key_colors[segment+1]
-
-        (cur_index..next_index).each do |index|
-          coefficient = (( index - cur_index ).to_f / ( next_index - cur_index ).to_f)
-          color_map[index] = Brewfish::Color.lerp_between( cur_color, next_color, coefficient )
-        end
+    class << self
+      # Lerp between two colors
+      def lerp_between( start_color, target_color, coefficient )
+        return start_color.lerp( target_color, coefficient )
       end
+      
+      # Given a map of keyer colors and desired indices, build a color
+      # map consisting of intermediate colors weighted by integer index
+      def build_color_map( key_colors )
+        color_map = {}
 
-      return color_map
+        (key_colors.length - 1).times do |segment|
+          cur_index, cur_color = key_colors[segment]
+          next_index, next_color = key_colors[segment+1]
+
+          (cur_index..next_index).each do |index|
+            coefficient = (( index - cur_index ).to_f / ( next_index - cur_index ).to_f)
+            color_map[index] = Brewfish::Color.lerp_between( cur_color, next_color, coefficient )
+          end
+        end
+
+        return color_map
+      end
     end
+
   end
 
   #----------------------------------------------------------------------------
-  # Named Color Definitions
+  # Constants
   #----------------------------------------------------------------------------
   
+  # Named Color Definitions
   NAMED_COLORS = {
     # Grey levels
     :black => [0,0,0],
@@ -318,6 +395,7 @@ module Brewfish
 
     # Misc
     :celadon => [172,255,175],
-    :peach => [255,159,127]
+    :peach => [255,159,127],
+    :ref_color => [0xAA, 0xBB, 0xCC]
   }
 end

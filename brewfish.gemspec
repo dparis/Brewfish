@@ -22,6 +22,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency "rspec"
   s.add_development_dependency "pry"
   
-  s.add_runtime_dependency "color"
-  s.add_runtime_dependency "rubysdl"
+  s.add_runtime_dependency "gosu"
 end

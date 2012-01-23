@@ -24,17 +24,5 @@ describe 'Brewfish' do
         end
       end
     end
-
-    context '::Colors' do
-      context 'hsv/hsl conversion methods' do
-        it 'should convert values from hsv to hsl' do
-          Brewfish::Util::Colors.hsv_to_hsl( 348, 0.9071, 0.8601 ).should == [ 348, 0.83, 0.47 ]
-        end
-
-        it 'should convert values from hsl to hsv' do
-          Brewfish::Util::Colors.hsl_to_hsv( 348, 0.83, 0.47 ).should == [ 348, 0.9071, 0.8601 ]
-        end
-      end
-    end
   end
 end
