@@ -9,19 +9,14 @@ module Internal
     def draw
       if @tile
         # Draw the background color
-        x1, y1 = @x, @y                                                     # Top Left
-        x2, y2 = @x, ((@y + @@cell_height) - 1)                             # Bottom Left
-        x3, y3 = ((@x + @@cell_width) - 1), @y                              # Top Right
-        x4, y4 = ((@x + @@cell_width) - 1), ((@y + @@cell_height) - 1)      # Bottom Right
-
-        @@console.draw_quad( x1, y1, @bg_color.argb,  # Top Left
-                             x2, y2, @bg_color.argb,  # Top Right
-                             x3, y3, @bg_color.argb,  # Bottom Left
-                             x4, y4, @bg_color.argb,  # Bottom Right
+        @@console.draw_quad( @quad_x1, @quad_y1, @bg_argb,  # Top Left
+                             @quad_x2, @quad_y2, @bg_argb,  # Top Right
+                             @quad_x3, @quad_y3, @bg_argb,  # Bottom Left
+                             @quad_x4, @quad_y4, @bg_argb,  # Bottom Right
                              Internal::GosuConsole::ZOrder::Background )
         
         # Draw the tile
-        @tile.draw( @x, @y, Internal::GosuConsole::ZOrder::Grid, 1, 1, @fg_color.argb )
+        @tile.draw( @x, @y, Internal::GosuConsole::ZOrder::Grid, 1, 1, @fg_argb )
         @dirty = false
       end
     end
@@ -69,6 +64,11 @@ module Internal
 
       @x = @col * @@cell_width
       @y = @row * @@cell_height
+
+      @quad_x1, @quad_y1 = @x, @y                                                     # Top Left
+      @quad_x2, @quad_y2 = @x, ((@y + @@cell_height) - 1)                             # Bottom Left
+      @quad_x3, @quad_y3 = ((@x + @@cell_width) - 1), @y                              # Top Right
+      @quad_x4, @quad_y4 = ((@x + @@cell_width) - 1), ((@y + @@cell_height) - 1)      # Bottom Right
     end
   end
 end

@@ -1,20 +1,27 @@
 require 'gosu'
 
 require_relative 'gosu_cell'
+require_relative 'fps_counter'
 
 module Internal
   class GosuConsole < Gosu::Window
     #----------------------------------------------------------------------------
     # Constants
     #----------------------------------------------------------------------------
+
+    # Default location for font tile image files, relative to gem root
     DEFAULT_FONT_DIR = 'data/fonts/'
 
+    # Default options to init the object with
+    # NOTE: Some options are passed through to Gosu::Window directly,
+    # see Gosu documentation for more details:
+    # http://www.libgosu.org/rdoc/Gosu/Window.html
     DEFAULT_INIT_OPTIONS = {
       :caption => 'BrewFish',
-      :width => 1024,
-      :height => 768,
-      :fullscreen => false,
-      :update_interval => 16.666666,
+      :width => 1024,                           # Gosu::Window option
+      :height => 768,                           # Gosu::Window option
+      :fullscreen => false,                     # Gosu::Window option
+      :update_interval => 16.666666,            # Gosu::Window option
       :font => {
         :tcod_png => {
           :file => 'tcod/arial12x12.png'
@@ -26,10 +33,15 @@ module Internal
     #----------------------------------------------------------------------------
     # Nested Class Modules
     #----------------------------------------------------------------------------
+
+    # Rendering depths for draw operations on Gosu objects, with zero being
+    # the lowest depth
     module ZOrder
       Background, Grid, Overlay = *0..2
     end
 
+    # Mappings between character codes and tile locations
+    # TODO: Refactor bitmap font loading into a separate class  --  Fri Jan 27 13:31:01 2012
     module FontImgAsciiMap
       TCOD = [ 0,  0,  0,  0,  0,  0,  0,  0,  0,  76, 77, 0,  0,  0,  0,  0,   # ASCII 0 to 15
                71, 70, 72, 0,  0,  0,  0,  0,  64, 65, 67, 66, 0,  73, 68, 69,  # ASCII 16 to 31
@@ -52,7 +64,7 @@ module Internal
     #----------------------------------------------------------------------------
     # Attributes
     #----------------------------------------------------------------------------
-    attr_reader :tile_width, :tile_height, :cells, :tiles
+    attr_reader :tile_width, :tile_height, :cells, :tiles, :rows, :cols
 
     #----------------------------------------------------------------------------
     # Instance Methods
@@ -76,6 +88,7 @@ module Internal
       super( options[:width], options[:height],
              options[:fullscreen], options[:update_interval] )
       
+      # TODO: Refactor bitmap font loading into another class  --  Fri Jan 27 13:32:15 2012
       # Load Gosu::Font from the options passed
       @font = nil
 
@@ -118,70 +131,113 @@ module Internal
         raise ArgumentError, "Invalid font type: #{font_type}"
       end
 
-      # Set up cells for drawing characters or tiles to the window
+      # Set up cells for drawing tiles to the window
       @cells = nil
 
       GosuCell.configure_dimensions( self )
       setup_cells
-
+      
       # Set up callback target for things like calling a defined
       # game loop method from update
       # TODO: Custom Brewfish error type here  --  Fri Jan 27 11:05:11 2012
       raise "options[:callback_target] must be defined: #{options}" unless options[:callback_target]
       @callback_target = options[:callback_target]
+
+      # Set up an FPS overlay
+      if options[:show_fps]
+        @fps = FPSCounter.new( self )
+        @fps.show_fps = true
+      end
     end
 
+    # Update method is called once per update interval, which is
+    # specified in the options parameter passed to the class at time
+    # of initialization
     def update
       @callback_target.game_loop
     end
 
+    # Draw is called by Gosu::Window every time the OS wants the
+    # screen to be redrawn, can also be limited by overriding
+    # needs_redraw?, though according to Gosu documentation the OS may
+    # still force a redraw for various reasons
+    # http://www.libgosu.org/rdoc/Gosu/Window.html
     def draw
-      active_cells.each do |cell|
-        cell.draw
+      # Rebuild the grid image data and then draw it
+      rebuild_grid_image
+      @cell_grid_image.draw( 0, 0, ZOrder::Grid )
+
+      # Draw the FPS overlay if the object exists
+      @fps.update if @fps
+    end
+
+    # Overriding needs_redraw? will let the object specify whether the
+    # window needs to be redrawn, which will limit the amount of times
+    # draw is called
+    def needs_redraw?
+      redraw = false
+
+      # If any cell has been marked dirty, the any_dirty? class method
+      # will return true, so tell the Cell class that all cells have
+      # been drawn, and return true to ensure that the draw method
+      # renders the updated grid image data
+      if Cell.any_dirty?
+        Cell.drawn_all
+        redraw = true
       end
+
+      return redraw
     end
 
-    def set_char_at( col, row, char )
-      @cells[row][col].char = char
-    end
-
-    def set_tile_at( col, row, tile )
-      @cells[row][col].tile = tile
-    end
-
-    #----------------------------------------------------------------------------
-    # Protected Instance Methods
-    #----------------------------------------------------------------------------
-    protected
-
-    def setup_cells
-      cols = GosuCell.max_cols
-      rows = GosuCell.max_rows
-
-      @cells = []
-
-      rows.times do |row_index|
-        row = []
-        
-        cols.times do |col_index|
-          row << GosuCell.new( col_index, row_index )
-        end
-
-        @cells << row
-      end
-    end
-    
     #----------------------------------------------------------------------------
     # Private Instance Methods
     #----------------------------------------------------------------------------
     private
 
+    # Called from the initialize method, this will configure an array
+    # of Cell instances based on the maximum number of cells in each
+    # row and column of the window
+    def setup_cells
+      # The max_cols and max_rows are determined based on the window
+      # dimensions passed into the GosuCell.configure_dimensions
+      # method during window init
+      @cols = GosuCell.max_cols
+      @rows = GosuCell.max_rows
+
+      @cells = []
+
+      @rows.times do |row_index|
+        row = []
+        
+        @cols.times do |col_index|
+          row << GosuCell.new( col_index, row_index )
+        end
+
+        @cells << row
+      end
+
+      # Flatten the nested cell arrays so that drawing ops have a
+      # slightly optimized way to iterate over all cells
+      @cell_draw_array = @cells.flatten
+    end
+
+    # Rebuild the grid image data using the Gosu::Window#record method
+    # to batch all of the drawing operations 
+    def rebuild_grid_image
+      @cell_grid_image = self.record( self.width, self.height ) do
+        @cell_draw_array.each do |cell|
+          cell.draw
+        end
+      end
+    end
+
+    # Some utility methods of dubious import
     def dirty_cells
-      @cells.flatten.select{|c| c.dirty?}
+      @cell_draw_array.select{|c| c.dirty?}
     end
 
     def active_cells
-      @cells.flatten.select{|c| c.tile || c.char}
+      @cell_draw_array.select{|c| c.tile || c.char}
     end
   end
 end

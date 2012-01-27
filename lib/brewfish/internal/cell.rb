@@ -7,8 +7,7 @@ module Internal
       :fg_color => Brewfish::Color.new( :named => :white )
     }
 
-    attr_accessor :bg_color, :fg_color
-    attr_reader :x, :y, :col, :row, :tile, :char
+    attr_reader :x, :y, :col, :row, :tile, :char, :bg_color, :fg_color
     attr_writer :dirty
 
     @@console = nil
@@ -22,6 +21,8 @@ module Internal
     @@max_x = nil
     @@max_y = nil
 
+    @@any_dirty = true
+
     def initialize( col, row, options = {} )
       options = DEFAULT_INIT_OPTIONS.merge( options )
 
@@ -32,26 +33,44 @@ module Internal
       @tile = options[:tile]
 
       # Handle color options
-      @bg_color = options[:bg_color]
-      @fg_color = options[:fg_color]
+      self.bg_color = options[:bg_color]
+      self.fg_color = options[:fg_color]
 
-      @dirty = false
+      # Default to dirty to ensure initial rendering
+      self.dirty = true
 
       calculate_x_y
     end
 
     def tile=( tile )
       @tile = tile
-      @dirty = true
+      self.dirty = true
     end
 
     def char=( char )
       @char = char
-      @dirty = true
+      self.dirty = true
+    end
+
+    def bg_color=( bg_color )
+      @bg_color = bg_color
+      @bg_argb = bg_color.argb
+      self.dirty = true
+    end
+
+    def fg_color=( fg_color )
+      @fg_color = fg_color
+      @fg_argb = fg_color.argb
+      self.dirty = true
     end
 
     def dirty?
       @dirty
+    end
+
+    def dirty=( is_dirty )
+      @dirty = is_dirty
+      @@any_dirty = true if is_dirty
     end
 
     def draw
@@ -69,6 +88,14 @@ module Internal
 
         @@max_cols = @@max_x
         @@max_rows = @@max_y
+      end
+
+      def any_dirty?
+        @@any_dirty
+      end
+
+      def drawn_all
+        @@any_dirty = false
       end
     end
 
