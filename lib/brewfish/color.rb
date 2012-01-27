@@ -145,7 +145,14 @@ module Brewfish
       return new_color
     end
 
+    def argb
+      self.alpha << 24 | self.red << 16 | self.green << 8 | self.blue
+    end
 
+    def rgba
+      self.red << 24 | self.green << 16 | self.blue << 8 | self.alpha
+    end
+    
     #----------------------------------------------------------------------------
     # Class Methods
     #----------------------------------------------------------------------------

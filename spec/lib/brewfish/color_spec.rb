@@ -13,7 +13,8 @@ describe 'Brewfish' do
       @dark_grey = Brewfish::Color.new( :named => :dark_grey )
       
       @ref_color = Brewfish::Color.new( :rgba => [0xAA, 0xBB, 0xCC, 0xFF] )
-      @ref_color_int = 0xFFAABBCC
+      @ref_color_int_argb = 0xFFAABBCC
+      @ref_color_int_rgba = 0xAABBCCFF
       @ref_red   = 0xAA
       @ref_green = 0xBB
       @ref_blue  = 0xCC
@@ -41,7 +42,7 @@ describe 'Brewfish' do
       end
       
       it 'should accept 32-bit packed ARGB value' do
-        color = Brewfish::Color.new( :argb_int => @ref_color_int )
+        color = Brewfish::Color.new( :argb_int => @ref_color_int_argb )
 
         color.red.should   == @ref_red
         color.green.should == @ref_green
@@ -72,6 +73,16 @@ describe 'Brewfish' do
       it 'should accept a named color' do
         color = Brewfish::Color.new( :named => :ref_color )
         color.should == @ref_color
+      end
+    end
+
+    context 'packed output' do
+      it 'should format the color as 0xAARRGGBB' do
+        @ref_color.argb.should == @ref_color_int_argb
+      end
+
+      it 'should format the color as 0xRRGGBBAA' do
+        @ref_color.rgba.should == @ref_color_int_rgba
       end
     end
 
