@@ -155,6 +155,11 @@ module Internal
     # of initialization
     def update
       @callback_target.game_loop
+
+      if Cell.any_dirty?
+        rebuild_grid_image
+        Cell.drawn_all
+      end
     end
 
     # Draw is called by Gosu::Window every time the OS wants the
@@ -163,8 +168,7 @@ module Internal
     # still force a redraw for various reasons
     # http://www.libgosu.org/rdoc/Gosu/Window.html
     def draw
-      # Rebuild the grid image data and then draw it
-      rebuild_grid_image
+      # Draw the cell grid
       @cell_grid_image.draw( 0, 0, ZOrder::Grid )
 
       # Draw the FPS overlay if the object exists
@@ -174,20 +178,10 @@ module Internal
     # Overriding needs_redraw? will let the object specify whether the
     # window needs to be redrawn, which will limit the amount of times
     # draw is called
-    def needs_redraw?
-      redraw = false
-
-      # If any cell has been marked dirty, the any_dirty? class method
-      # will return true, so tell the Cell class that all cells have
-      # been drawn, and return true to ensure that the draw method
-      # renders the updated grid image data
-      if Cell.any_dirty?
-        Cell.drawn_all
-        redraw = true
-      end
-
-      return redraw
-    end
+    # def needs_redraw?
+    #   redraw = false
+    #   return redraw
+    # end
 
     #----------------------------------------------------------------------------
     # Private Instance Methods
