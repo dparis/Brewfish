@@ -6,18 +6,22 @@ describe 'Brewfish' do
       @console = Brewfish::Console.new
     end
 
-    context 'update method' do
-      it 'should exist'
-      it 'should accept a block'
-      it 'should affect the state of the cells'
+    # TODO: Flesh these out more  --  Fri Jan 27 17:04:05 2012
+    context 'game_setup method' do
+      it 'should exist' do
+        @console.should respond_to(:game_setup)
+      end
     end
 
-    context 'show method' do
-      it 'should exist'
+    context 'game_loop method' do
+      it 'should exist' do
+        @console.should respond_to(:game_loop)
+      end
     end
 
-    context '::Internal' do
-      context '::GosuConsole' do
+    context 'game_start method' do
+      it 'should exist' do
+        @console.should respond_to(:game_start)
       end
     end
   end

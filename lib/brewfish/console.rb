@@ -12,13 +12,16 @@ module Brewfish
     # Delegated Methods
     #----------------------------------------------------------------------------
     def_delegators( :@console_delegate, :cells, :dirty_cells,
-                    :active_cells, :tiles, :width, :height,
-                    :rows, :cols )
+                                        :active_cells, :tiles, :width, :height,
+                                        :rows, :cols )
 
     #----------------------------------------------------------------------------
     # Instance Methods
     #----------------------------------------------------------------------------
     def initialize( options = {} )
+      # Default to Gosu rendered console
+      options[:type] ||= :gosu
+
       case options[:type]
       when :gosu
         options[:callback_target] = self
