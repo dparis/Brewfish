@@ -9,7 +9,7 @@ class Game < Brewfish::Console
   def game_loop
     if (@i % 6) == 0
       cell = cells[rand(rows)][rand(cols)]
-      cell.tile = tiles['X']
+      cell.tile = tileset['X']
       cell.fg_color = @red
     end
   end

@@ -11,8 +11,7 @@ module Brewfish
     #----------------------------------------------------------------------------
     # Delegated Methods
     #----------------------------------------------------------------------------
-    def_delegators( :@console_delegate, :cells, :dirty_cells,
-                                        :active_cells, :tiles, :width, :height,
+    def_delegators( :@console_delegate, :cells, :tileset, :width, :height,
                                         :rows, :cols )
 
     #----------------------------------------------------------------------------
