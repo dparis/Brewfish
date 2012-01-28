@@ -11,7 +11,7 @@ module Brewfish
     #----------------------------------------------------------------------------
     # Delegated Methods
     #----------------------------------------------------------------------------
-    def_delegators( :@console_delegate, :show, :cells, :dirty_cells,
+    def_delegators( :@console_delegate, :cells, :dirty_cells,
                     :active_cells, :tiles, :width, :height,
                     :rows, :cols )
 
@@ -29,7 +29,15 @@ module Brewfish
       end
     end
 
+    def game_setup
+    end
+
     def game_loop
+    end
+
+    def game_start
+      game_setup
+      @console_delegate.show
     end
   end
 end
