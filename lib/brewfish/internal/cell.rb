@@ -1,3 +1,5 @@
+require 'pry'
+
 module Internal
   class Cell
     DEFAULT_INIT_OPTIONS = {
@@ -7,7 +9,7 @@ module Internal
       :fg_color => nil
     }
 
-    attr_reader :x, :y, :col, :row, :tile, :char, :bg_color, :fg_color
+    attr_reader :x, :y, :col, :row, :tile, :char, :bg_argb, :fg_argb
     attr_writer :dirty
 
     @@console = nil
@@ -23,18 +25,18 @@ module Internal
 
     @@any_dirty = true
 
-    def initialize( col, row, options = {} )
+    def initialize( row, col, options = {} )
       options = DEFAULT_INIT_OPTIONS.merge( options )
 
-      @col = col
       @row = row
+      @col = col
 
       @char = options[:char]
       @tile = options[:tile]
 
       # Handle color options
-      self.bg_color = options[:bg_color]
-      self.fg_color = options[:fg_color]
+      self.bg_argb = options[:bg_argb]
+      self.fg_argb = options[:fg_argb]
 
       # Default to dirty to ensure initial rendering
       self.dirty = true
@@ -43,25 +45,23 @@ module Internal
     end
 
     def tile=( tile )
+      self.dirty = true unless tile == @tile
       @tile = tile
-      self.dirty = true
     end
 
     def char=( char )
+      self.dirty = true unless char == @char
       @char = char
-      self.dirty = true
     end
 
-    def bg_color=( bg_color )
-      @bg_color = bg_color
-      @bg_argb = bg_color ? @bg_color.argb : nil
-      self.dirty = true
+    def bg_argb=( bg_argb )
+      self.dirty = true unless bg_argb == @bg_argb
+      @bg_argb = bg_argb
     end
 
-    def fg_color=( fg_color )
-      @fg_color = fg_color
-      @fg_argb = fg_color ? @fg_color.argb : nil
-      self.dirty = true
+    def fg_argb=( fg_argb )
+      self.dirty = true unless fg_argb == @fg_argb
+      @fg_argb = fg_argb
     end
 
     def dirty?

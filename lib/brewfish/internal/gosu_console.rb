@@ -161,8 +161,8 @@ module Internal
       # The max_cols and max_rows are determined based on the window
       # dimensions passed into the GosuCell.configure_dimensions
       # method during window init
-      @cols = GosuCell.max_cols
       @rows = GosuCell.max_rows
+      @cols = GosuCell.max_cols
 
       @cells = []
 
@@ -170,7 +170,7 @@ module Internal
         row = []
         
         @cols.times do |col_index|
-          row << GosuCell.new( col_index, row_index )
+          row << GosuCell.new( row_index, col_index )
         end
 
         @cells << row

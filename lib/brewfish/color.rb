@@ -57,6 +57,10 @@ module Brewfish
       end
 
       super( @gosu_color )
+
+      # Calculate argb and rgba values
+      @argb = self.alpha << 24 | self.red << 16 | self.green << 8 | self.blue
+      @rgba = self.red << 24 | self.green << 16 | self.blue << 8 | self.alpha
     end
 
     #----------------------------------------------------------------------------
@@ -146,11 +150,11 @@ module Brewfish
     end
 
     def argb
-      self.alpha << 24 | self.red << 16 | self.green << 8 | self.blue
+      @argb
     end
 
     def rgba
-      self.red << 24 | self.green << 16 | self.blue << 8 | self.alpha
+      @rgba
     end
     
     #----------------------------------------------------------------------------

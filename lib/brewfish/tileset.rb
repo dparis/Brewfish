@@ -66,7 +66,7 @@ module Brewfish
         @tile_height = font_info[:height]
         
         Internal::FontImgAsciiMap::TCOD.count.times do |map_index|
-          @tiles[map_index.chr] = font_images[Internal::FontImgAsciiMap::TCOD[map_index]]
+          @tiles[map_index.chr.freeze] = font_images[Internal::FontImgAsciiMap::TCOD[map_index]]
         end
       else
         raise ArgumentError, "Invalid font type: #{tileset_type}"

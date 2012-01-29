@@ -22,6 +22,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency "rake"
   s.add_development_dependency "rspec"
   s.add_development_dependency "pry"
-  
+  s.add_development_dependency "ruby-prof"
+
   s.add_runtime_dependency "gosu"
 end
