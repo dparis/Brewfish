@@ -3,8 +3,8 @@ module Internal
     DEFAULT_INIT_OPTIONS = {
       :char => nil,
       :tile => nil,
-      :bg_color => Brewfish::Color.new( :named => :black ),
-      :fg_color => Brewfish::Color.new( :named => :white )
+      :bg_color => nil,
+      :fg_color => nil
     }
 
     attr_reader :x, :y, :col, :row, :tile, :char, :bg_color, :fg_color
@@ -54,13 +54,13 @@ module Internal
 
     def bg_color=( bg_color )
       @bg_color = bg_color
-      @bg_argb = bg_color.argb
+      @bg_argb = bg_color ? @bg_color.argb : nil
       self.dirty = true
     end
 
     def fg_color=( fg_color )
       @fg_color = fg_color
-      @fg_argb = fg_color.argb
+      @fg_argb = fg_color ? @fg_color.argb : nil
       self.dirty = true
     end
 

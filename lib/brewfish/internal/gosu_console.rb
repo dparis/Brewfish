@@ -24,6 +24,11 @@ module Internal
       }
     }
 
+    # Create a mapping of the Gosu::Kb* constants, with cleaned up keys
+    KEYBOARD_MAP = Hash[ Gosu.constants.select{|c| c.to_s.match(/^Kb.*/)}.map do |constant|
+                           new_constant = constant.to_s.gsub(/(.)([A-Z])/,'\1_\2').downcase.to_sym
+                           [new_constant, Gosu.const_get( constant )]
+                         end ]
 
     #----------------------------------------------------------------------------
     # Nested Class Modules
@@ -39,7 +44,7 @@ module Internal
     #----------------------------------------------------------------------------
     # Attributes
     #----------------------------------------------------------------------------
-    attr_reader :cells, :tileset, :rows, :cols
+    attr_reader :cells, :tileset, :rows, :cols, :keyboard_map
 
     #----------------------------------------------------------------------------
     # Instance Methods
@@ -93,6 +98,10 @@ module Internal
       @tileset.tile_height
     end
 
+    def keyboard_map
+      KEYBOARD_MAP
+    end
+
     # Update method is called once per update interval, which is
     # specified in the options parameter passed to the class at time
     # of initialization
@@ -125,6 +134,20 @@ module Internal
     #   redraw = false
     #   return redraw
     # end
+
+    # button_down is called before update when the user pressed a
+    # button while the window had focus
+    def button_down( button_id )
+      # Call back to the proxy object
+      @callback_target.on_button_down( button_id )
+    end
+
+    # button_up is called before update when the user released a
+    # button while the window had focus
+    def button_up( button_id )
+      # Call back to the proxy object
+      @callback_target.on_button_up( button_id )
+    end
 
     #----------------------------------------------------------------------------
     # Private Instance Methods

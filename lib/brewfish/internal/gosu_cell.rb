@@ -7,7 +7,7 @@ module Internal
     @@cell_height = nil
     
     def draw
-      if @tile
+      if @tile && @bg_color && @fg_color
         # Draw the background color
         @@console.draw_quad( @quad_x1, @quad_y1, @bg_argb,  # Top Left
                              @quad_x2, @quad_y2, @bg_argb,  # Top Right
