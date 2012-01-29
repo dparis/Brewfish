@@ -76,6 +76,13 @@ module Internal
     def draw
     end
 
+    def clear
+      @tile = nil
+      @char = nil
+      @bg_argb = nil
+      @fg_argb = nil
+    end
+
     class << self
       def configure_dimensions( console )
         @@console = console

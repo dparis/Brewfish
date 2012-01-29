@@ -187,6 +187,7 @@ module Internal
       @cell_grid_image = self.record( self.width, self.height ) do
         @cell_draw_array.each do |cell|
           cell.draw
+          cell.clear
         end
       end
     end

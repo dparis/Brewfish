@@ -43,15 +43,15 @@ class Game < Brewfish::Console
   end
 
   def game_loop
-    if @i > 600
-      game_close
-    end
+    # if @i > 600
+    #   game_close
+    # end
 
-    @i += 1
+    # @i += 1
       
-    if button_down?( @last_button_id ) || true
-      on_button_down( @last_button_id )
-    end
+    # if button_down?( @last_button_id )
+    #   on_button_down( @last_button_id )
+    # end
 
     @bombs.each do |bomb|
       bomb_cell = cells[bomb.row][bomb.col]
@@ -94,17 +94,17 @@ class Game < Brewfish::Console
   end
 
   def on_button_up( button_id )
-    # @last_button_id = nil
+    @last_button_id = nil
   end
 end
 
 console = Game.new( :type => :gosu, :show_fps => true )
-# console.game_start
+console.game_start
 
-result = RubyProf.profile do
-  console.game_start
-end
+#result = RubyProf.profile do
+#  console.game_start
+#end
 
-printer = RubyProf::CallTreePrinter.new(result)
-f = File.new('tmp/call_tree', 'w')
-printer.print(f, {})
+#printer = RubyProf::CallTreePrinter.new(result)
+#f = File.new('tmp/call_tree', 'w')
+#printer.print(f, {})
