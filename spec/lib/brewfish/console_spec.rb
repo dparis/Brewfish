@@ -27,36 +27,36 @@ describe 'Brewfish' do
       it 'should be a delegated method'
     end
 
-    context 'width accessor method' do
+    context 'pixel_width accessor method' do
       it 'should exist' do
-        @console.should respond_to(:width)
+        @console.should respond_to(:pixel_width)
       end
 
       # TODO: Figure out if there's a way to determine if this is delegated  --  Sat Jan 28 13:13:05 2012
       it 'should be a delegated method'
     end
 
-    context 'height accessor method' do
+    context 'pixel_height accessor method' do
       it 'should exist' do
-        @console.should respond_to(:height)
+        @console.should respond_to(:pixel_height)
       end
 
       # TODO: Figure out if there's a way to determine if this is delegated  --  Sat Jan 28 13:13:05 2012
       it 'should be a delegated method'
     end
 
-    context 'cols accessor method' do
+    context 'unit_width accessor method' do
       it 'should exist' do
-        @console.should respond_to(:cols)
+        @console.should respond_to(:unit_width)
       end
 
       # TODO: Figure out if there's a way to determine if this is delegated  --  Sat Jan 28 13:13:05 2012
       it 'should be a delegated method'
     end
 
-    context 'rows accessor method' do
+    context 'unit_height accessor method' do
       it 'should exist' do
-        @console.should respond_to(:rows)
+        @console.should respond_to(:unit_height)
       end
 
       # TODO: Figure out if there's a way to determine if this is delegated  --  Sat Jan 28 13:13:05 2012

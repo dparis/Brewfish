@@ -15,8 +15,8 @@ module Internal
     # http://www.libgosu.org/rdoc/Gosu/Window.html
     DEFAULT_INIT_OPTIONS = {
       :caption => 'BrewFish',
-      :width => 1024,                           # Gosu::Window option
-      :height => 768,                           # Gosu::Window option
+      :pixel_width => 1024,                     # Gosu::Window option
+      :pixel_height => 768,                     # Gosu::Window option
       :fullscreen => false,                     # Gosu::Window option
       :update_interval => 16.666666,            # Gosu::Window option
       :tileset => {
@@ -44,7 +44,7 @@ module Internal
     #----------------------------------------------------------------------------
     # Attributes
     #----------------------------------------------------------------------------
-    attr_reader :cells, :tileset, :rows, :cols, :keyboard_map
+    attr_reader :cells, :tileset, :pixel_width, :pixel_height, :unit_width, :unit_height, :keyboard_map
 
     #----------------------------------------------------------------------------
     # Instance Methods
@@ -65,7 +65,7 @@ module Internal
       # TODO: Support loading FPS rather than update interval in ms  --  Tue Jan 24 00:07:37 2012
 
       # Init the Gosu window through the parent class
-      super( options[:width], options[:height],
+      super( options[:pixel_width], options[:pixel_height],
              options[:fullscreen], options[:update_interval] )
 
       
@@ -89,6 +89,9 @@ module Internal
         @fps.show_fps = true
       end
     end
+
+    alias :pixel_width :width
+    alias :pixel_height :height
 
     def tile_width
       @tileset.tile_width
@@ -161,16 +164,16 @@ module Internal
       # The max_cols and max_rows are determined based on the window
       # dimensions passed into the GosuCell.configure_dimensions
       # method during window init
-      @rows = GosuCell.max_rows
-      @cols = GosuCell.max_cols
+      @unit_width  = GosuCell.unit_width
+      @unit_height = GosuCell.unit_height
 
       @cells = []
 
-      @rows.times do |row_index|
+      @unit_height.times do |y_index|
         row = []
         
-        @cols.times do |col_index|
-          row << GosuCell.new( row_index, col_index )
+        @unit_width.times do |x_index|
+          row << GosuCell.new( x_index, y_index )
         end
 
         @cells << row
@@ -184,7 +187,7 @@ module Internal
     # Rebuild the grid image data using the Gosu::Window#record method
     # to batch all of the drawing operations 
     def rebuild_grid_image
-      @cell_grid_image = self.record( self.width, self.height ) do
+      @cell_grid_image = self.record( self.pixel_width, self.pixel_height ) do
         @cell_draw_array.each do |cell|
           cell.draw
           cell.clear

@@ -11,8 +11,9 @@ module Brewfish
     #----------------------------------------------------------------------------
     # Delegated Methods
     #----------------------------------------------------------------------------
-    def_delegators( :@console_delegate, :cells, :tileset, :width, :height,
-                                        :rows, :cols, :button_down?, :keyboard_map )
+    def_delegators( :@console_delegate, :cells, :tileset, :pixel_width, :pixel_height,
+                                        :unit_width, :unit_height, :button_down?,
+                                        :keyboard_map )
 
     # Method descriptions
     #
@@ -23,16 +24,15 @@ module Brewfish
     #           the settings specified during initialization of the
     #           Console instance
     #
-    # width - Returns the pixel width of the Console instance
+    # pixel_width - Returns the pixel width of the Console instance
     #
-    # height - Returns the pixel height of the Console instance
+    # pixel_height - Returns the pixel height of the Console instance
     #
-    # rows - Returns the number of cell rows addressable by the
-    #        Console instance
+    # unit_height - Returns the vertical number of cell units
+    #               addressable by the Console instance
     #
-    #
-    # cols - Returns the number of cell columns addressable by the
-    #        Console instance
+    # unit_width - Returns the horizontal number of cell units
+    #              addressable by the Console instance
     #
     # button_down? - Return boolean indicating whether a given button
     #                id is being held down; only valid within the

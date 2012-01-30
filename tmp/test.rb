@@ -2,18 +2,18 @@ require 'brewfish'
 require 'ruby-prof'
 
 class Player
-  attr_accessor :col, :row
+  attr_accessor :x, :y
 
-  def initialize
-    @col, @row = 0, 0
+  def initialize( x=0, y=0 )
+    @x, @y = x, y
   end
 end
 
 class Bomb
-  attr_accessor :col, :row
+  attr_accessor :x, :y
 
-  def initialize( col=0, row=0 )
-    @col, @row = col, row
+  def initialize( x=0, y=0 )
+    @x, @y = x, y
   end
 end
 
@@ -28,6 +28,7 @@ class Game < Brewfish::Console
 
   def game_setup
     @i = 0
+    @bomb_count = 0
 
     @red = Brewfish::Color.new( :named => :red ).argb
     @blue = Brewfish::Color.new( :named => :blue ).argb
@@ -38,8 +39,6 @@ class Game < Brewfish::Console
     @bombs = []
 
     @last_button_id = keyboard_map[:kb_a]
-
-    puts "rows/cols #{rows}/#{cols}"
   end
 
   def game_loop
@@ -49,18 +48,18 @@ class Game < Brewfish::Console
 
     # @i += 1
       
-    # if button_down?( @last_button_id )
-    #   on_button_down( @last_button_id )
-    # end
+    if button_down?( @last_button_id )
+      on_button_down( @last_button_id )
+    end
 
     @bombs.each do |bomb|
-      bomb_cell = cells[bomb.row][bomb.col]
+      bomb_cell = cells[bomb.y][bomb.x]
       bomb_cell.tile = tileset['X']
       bomb_cell.fg_argb = @red
       bomb_cell.bg_argb = @black
     end
     
-    player_cell = cells[@player.row][@player.col]
+    player_cell = cells[@player.y][@player.x]
     player_cell.tile = tileset['@']
     player_cell.fg_argb = @blue
     player_cell.bg_argb = @white
@@ -73,23 +72,26 @@ class Game < Brewfish::Console
     when keyboard_map[:kb_escape]
       game_close
     when keyboard_map[:kb_a]
-      @bombs << Bomb.new(rand(cols), rand(rows))
+      @bombs << Bomb.new(rand(unit_width), rand(unit_height))
+      @bomb_count += 1
     when keyboard_map[:kb_up]
-      if @player.row > 0
-        @player.row -= 1
+      if @player.y > 0
+        @player.y -= 1
       end
     when keyboard_map[:kb_down]
-      if @player.row < (rows-1)
-        @player.row += 1
+      if @player.y < (unit_height-1)
+        @player.y += 1
       end
     when keyboard_map[:kb_right]
-      if @player.col < (cols-1)
-        @player.col += 1
+      if @player.x < (unit_width-1)
+        @player.x += 1
       end
     when keyboard_map[:kb_left]
-      if @player.col > 0
-        @player.col -= 1
+      if @player.x > 0
+        @player.x -= 1
       end
+    when keyboard_map[:kb_b]
+      puts @bomb_count
     end
   end
 
