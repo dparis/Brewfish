@@ -1,0 +1,65 @@
+---
+:tile_id: ! ' '
+:x: 3
+:y: 3
+---
+:tile_id: ! ' '
+:x: 4
+:y: 3
+---
+:tile_id: ! ' '
+:x: 5
+:y: 3
+---
+:tile_id: ! ' '
+:x: 6
+:y: 3
+---
+:tile_id: ! '#'
+:x: 3
+:y: 4
+---
+:tile_id: ! '#'
+:x: 4
+:y: 4
+---
+:tile_id: ! ' '
+:x: 5
+:y: 4
+---
+:tile_id: ! ' '
+:x: 6
+:y: 4
+---
+:tile_id: ! ' '
+:x: 3
+:y: 5
+---
+:tile_id: ! '#'
+:x: 4
+:y: 5
+---
+:tile_id: X
+:x: 5
+:y: 5
+:test_attribute: TEST
+---
+:tile_id: ! ' '
+:x: 6
+:y: 5
+---
+:tile_id: ! ' '
+:x: 3
+:y: 6
+---
+:tile_id: ! '#'
+:x: 4
+:y: 6
+---
+:tile_id: ! ' '
+:x: 5
+:y: 6
+---
+:tile_id: ! ' '
+:x: 6
+:y: 6

@@ -56,6 +56,29 @@ module Brewfish
       end
     end
 
+    def get_sub_map( x, y, width, height )
+      sub_rows = data[y, height]
+      
+      sub_data = []
+      sub_rows.each do |sub_row|
+        sub_data << sub_row[x, width]
+      end
+
+      sub_height = sub_rows.length
+      sub_width  = sub_rows.first.length
+        
+      map = self.class.new( sub_width, sub_height )
+      map.data = sub_data
+      return map
+    end
+
+    #----------------------------------------------------------------------------
+    # Protected Instance Methods
+    #----------------------------------------------------------------------------
+    def data=( data_array )
+      @data = data_array
+    end
+
     #----------------------------------------------------------------------------
     # Class Methods
     #----------------------------------------------------------------------------
