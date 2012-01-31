@@ -1,5 +1,6 @@
 require 'brewfish/console'
 require 'brewfish/tileset'
+require 'brewfish/map'
 require 'brewfish/point'
 require 'brewfish/line'
 require 'brewfish/color'

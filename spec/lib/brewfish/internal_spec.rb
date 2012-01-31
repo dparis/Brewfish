@@ -248,14 +248,14 @@ describe 'Brewfish' do
           x1.should == 24
           y1.should == 48
 
-          x2.should == 35
+          x2.should == 36
           y2.should == 48
 
           x3.should == 24
-          y3.should == 59
+          y3.should == 60
 
-          x4.should == 35
-          y4.should == 59
+          x4.should == 36
+          y4.should == 60
         end
       end
     end

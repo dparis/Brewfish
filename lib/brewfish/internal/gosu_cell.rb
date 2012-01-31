@@ -91,10 +91,10 @@ module Internal
       @pixel_x = @x * @@cell_pixel_width
       @pixel_y = @y * @@cell_pixel_height
 
-      @quad_x1, @quad_y1 = @pixel_x, @pixel_y                                                                 # Top Left
-      @quad_x2, @quad_y2 = ((@pixel_x + @@cell_pixel_width) - 1), @pixel_y                                    # Top Right
-      @quad_x3, @quad_y3 = @pixel_x, ((@pixel_y + @@cell_pixel_height) - 1)                                   # Bottom Left
-      @quad_x4, @quad_y4 = ((@pixel_x + @@cell_pixel_width) - 1), ((@pixel_y + @@cell_pixel_height) - 1)      # Bottom Right
+      @quad_x1, @quad_y1 = @pixel_x, @pixel_y                                                             # Top Left
+      @quad_x2, @quad_y2 = ((@pixel_x + @@cell_pixel_width)), @pixel_y                                    # Top Right
+      @quad_x3, @quad_y3 = @pixel_x, ((@pixel_y + @@cell_pixel_height))                                   # Bottom Left
+      @quad_x4, @quad_y4 = ((@pixel_x + @@cell_pixel_width)), ((@pixel_y + @@cell_pixel_height))          # Bottom Right
     end
   end
 end
